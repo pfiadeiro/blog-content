@@ -1,0 +1,324 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sourceSqlServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the SQL Server that will be used as source."
+            }
+        },
+        "sourceDBName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the SQL Database that will be used as source."
+            }
+        },
+        "targetSqlServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the SQL Server that will be used as target."
+            }
+        },
+        "targetDBName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the SQL Database that will be used as target."
+            }
+        },
+        "sqlAdminLogin": {
+            "type": "string",
+            "metadata": {
+                "description": "The administrator username of the SQL server."
+            }
+        },
+        "sqlAdminPassword": {
+            "type": "secureString",
+            "metadata": {
+                "description": "The administrator password of the SQL server."
+            }
+        },
+        "clientIpValue": {
+            "type": "string",
+            "metadata": {
+                "description": "IP to be added to firewall rules to allow connection to the server"
+            }
+        },
+        "dataFactoryName": {
+            "type": "string",
+            "metadata": {
+                "description": "Data Factory Name"
+            }
+        },
+        "sourceStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the storage account that will be used as source."
+            }
+        },
+        "sourceBlobContainer": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the blob container that will be used as source."
+            }
+        },
+        "targetStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the storage account that will be used as target."
+            }
+        },
+        "targetBlobContainer": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the blob container that will be used as target."
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "sourceSqlServerName": "[concat(parameters('sourceSqlServerName'), uniqueString(resourceGroup().id))]",
+        "targetSqlServerName": "[concat(parameters('targetSqlServerName'), uniqueString(resourceGroup().id))]",
+        "sqlAdminLogin": "[concat(parameters('sqlAdminLogin'), uniqueString(resourceGroup().id))]",
+        "dataFactoryName": "[concat(parameters('dataFactoryName'), uniqueString(resourceGroup().id))]",
+        "sourceStorageAccountName": "[concat(parameters('sourceStorageAccountName'), uniqueString(resourceGroup().id))]",
+        "targetStorageAccountName": "[concat(parameters('targetStorageAccountName'), uniqueString(resourceGroup().id))]"
+    },
+    "resources": [
+        {
+            "name": "[variables('sourceSqlServerName')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2020-11-01-preview",
+            "location": "[variables('location')]",
+            "properties": {
+                "administratorLogin": "[variables('sqlAdminLogin')]",
+                "administratorLoginPassword": "[parameters('sqlAdminPassword')]"
+            },
+            "resources": [
+                {
+                    "name": "[parameters('sourceDBName')]",
+                    "type": "databases",
+                    "apiVersion": "2020-11-01-preview",
+                    "location": "[variables('location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(variables('sourceSqlServerName')))]"
+                    ],
+                    "sku": {
+                        "name": "Basic",
+                        "tier": "Basic"
+                    },
+                    "properties": {
+                        "collation": "SQL_Latin1_General_CP1_CI_AS"
+                    }
+                },
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2020-11-01-preview",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(variables('sourceSqlServerName')))]"
+                    ],
+                    "location": "[variables('location')]",
+                    "name": "AllowAllWindowsAzureIps",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                },
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2020-11-01-preview",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(variables('sourceSqlServerName')))]"
+                    ],
+                    "location": "[variables('location')]",
+                    "name": "AllowClientIp",
+                    "properties": {
+                        "startIpAddress": "[parameters('clientIpValue')]",
+                        "endIpAddress": "[parameters('clientIpValue')]"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "[variables('targetSqlServerName')]",
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2020-11-01-preview",
+            "location": "[variables('location')]",
+            "properties": {
+                "administratorLogin": "[variables('sqlAdminLogin')]",
+                "administratorLoginPassword": "[parameters('sqlAdminPassword')]"
+            },
+            "resources": [
+                {
+                    "name": "[parameters('targetDBName')]",
+                    "type": "databases",
+                    "apiVersion": "2020-11-01-preview",
+                    "location": "[variables('location')]",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(variables('targetSqlServerName')))]"
+                    ],
+                    "sku": {
+                        "name": "Basic",
+                        "tier": "Basic"
+                    },
+                    "properties": {
+                        "collation": "SQL_Latin1_General_CP1_CI_AS"
+                    }
+                },
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2020-11-01-preview",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(variables('targetSqlServerName')))]"
+                    ],
+                    "location": "[variables('location')]",
+                    "name": "AllowAllWindowsAzureIps",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    }
+                },
+                {
+                    "type": "firewallRules",
+                    "apiVersion": "2020-11-01-preview",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Sql/servers', concat(variables('targetSqlServerName')))]"
+                    ],
+                    "location": "[variables('location')]",
+                    "name": "AllowClientIp",
+                    "properties": {
+                        "startIpAddress": "[parameters('clientIpValue')]",
+                        "endIpAddress": "[parameters('clientIpValue')]"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('sourceStorageAccountName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {},
+            "resources": [
+                {
+                    "type": "blobServices/containers",
+                    "apiVersion": "2019-06-01",
+                    "name": "[concat('default/', parameters('sourceBlobContainer'))]",
+                    "dependsOn": [
+                        "[variables('sourceStorageAccountName')]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('targetStorageAccountName')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {},
+            "resources": [
+                {
+                    "type": "blobServices/containers",
+                    "apiVersion": "2019-06-01",
+                    "name": "[concat('default/', parameters('targetBlobContainer'))]",
+                    "dependsOn": [
+                        "[variables('targetStorageAccountName')]"
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "Microsoft.DataFactory/factories",
+            "apiVersion": "2018-06-01",
+            "name": "[variables('dataFactoryName')]",
+            "location": "[variables('location')]",
+            "properties": {},
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "resources": [
+                {
+                    "type": "linkedServices",
+                    "apiVersion": "2018-06-01",
+                    "name": "LS_SQLServer",
+                    "location": "[variables('location')]",
+                    "dependsOn": [
+                        "[variables('dataFactoryName')]"
+                    ],
+                    "properties": {
+                        "type": "AzureSqlDatabase",
+                        "typeProperties": {
+                            "connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=ServerNameHere;Initial Catalog=DatabaseNameHere;User Id=UsernameHere;Password=PasswordHere"
+                        }
+                    }
+                },
+                {
+                    "type": "linkedServices",
+                    "apiVersion": "2018-06-01",
+                    "name": "LS_DataLakeStorage",
+                    "location": "[variables('location')]",
+                    "dependsOn": [
+                        "[variables('dataFactoryName')]"
+                    ],
+                    "properties": {
+                        "type": "AzureBlobFS",
+                        "typeProperties": {
+                            "url": "https://youraccountnamehere.dfs.core.windows.net"
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "outputs": {
+        "sourceSqlServer": {
+            "type": "string",
+            "value": "[reference(variables('sourceSqlServerName')).fullyQualifiedDomainName]"
+        },
+        "sourceDB": {
+            "type": "string",
+            "value": "[parameters('sourceDBName')]"
+        },
+        "sqlAdmin": {
+            "type": "string",
+            "value": "[variables('sqlAdminLogin')]"
+        },
+        "targetSqlServer": {
+            "type": "string",
+            "value": "[reference(variables('targetSqlServerName')).fullyQualifiedDomainName]"
+        },
+        "targetDB": {
+            "type": "string",
+            "value": "[parameters('targetDBName')]"
+        },
+        "sourceStorageAccountName": {
+            "type": "string",
+            "value": "[variables('sourceStorageAccountName')]"
+        },
+        "sourceBlobContainer": {
+            "type": "string",
+            "value": "[parameters('sourceBlobContainer')]"
+        },
+        "targetStorageAccountName": {
+            "type": "string",
+            "value": "[variables('targetStorageAccountName')]"
+        },
+        "targetBlobContainer": {
+            "type": "string",
+            "value": "[parameters('targetBlobContainer')]"
+        },
+        "dataFactoryName": {
+            "type": "string",
+            "value": "[variables('dataFactoryName')]"
+        }
+    }
+}

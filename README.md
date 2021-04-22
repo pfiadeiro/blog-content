@@ -1,1 +1,1 @@
-# blog-content
+# Content to support blog posts at [www.pedrofiadeiro.com](www.pedrofiadeiro.com)
