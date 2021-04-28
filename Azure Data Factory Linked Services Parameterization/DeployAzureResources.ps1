@@ -1,6 +1,8 @@
 # sqlServerPassword must be between 8 to 128 characters and include three of the following categories: 
 # English uppercase letters, English lowercase letters, numbers and non-alphanumeric characters. 
-# It cannot contain all or part of the login name')]
+# It cannot contain all or part of the login name
+
+# Example usage: .\DeployAzureResources.ps1 -SqlServerPassword 'YourVer1S3cur3Passw0rd' -RgName 'rg-name'
 
 [CmdletBinding(DefaultParametersetName='None')]
     param(
@@ -20,7 +22,7 @@
 
 
     function CheckResourceGroup {
-        Write-Host "Checking if resource group '$RgName' exists..." -ForegroundColor Blue
+        Write-Host "Checking if resource group '$RgName' exists..." -ForegroundColor Magenta
         $Rg = az group exists --resource-group $RgName
         if ($Rg -eq "false") {
 
@@ -165,7 +167,7 @@
         Write-Host "Starting RBAC assignment" -ForegroundColor Yellow
         $ADFName = az deployment group show -g $RgName --name 'demo-objects' --query properties.outputs.dataFactoryName.value -o tsv
 
-        $ADFObjectId = az datafactory factory show --name $ADFName -g $RgName --query identity.principalId -o tsv
+        $ADFObjectId = az deployment group show -g $RgName --name 'demo-objects' --query properties.outputs.dataFactoryPrincipalId.value -o tsv
 
         $ErrorMessage = $($Result = az role assignment create --role 'Storage Blob Data Contributor' --assignee $ADFObjectId -g $RgName) 2>&1
 

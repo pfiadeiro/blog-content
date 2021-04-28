@@ -319,6 +319,10 @@
         "dataFactoryName": {
             "type": "string",
             "value": "[variables('dataFactoryName')]"
+        },
+        "dataFactoryPrincipalId": {
+            "type": "string",
+            "value": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]"
         }
     }
 }
