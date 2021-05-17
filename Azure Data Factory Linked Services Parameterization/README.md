@@ -33,3 +33,9 @@ To execute the PowerShell script just run
 Take into account that the SQL Server Password  must be between 8 to 128 characters and include three of the following categories: English uppercase letters, English lowercase letters, numbers and non-alphanumeric characters. It cannot contain all or part of the login name.
 
 After executing the script you'll have all objects required to follow the steps described in the blog post.
+
+## Alternative Option
+
+If you prefer not to install the required PowerShell modules and az cli on your machine, you can simply use the Azure Cloud Shell to run this script. Simply upload all the required folders and files into your clouddrive directory and run the script directly from there.
+
+![CloudShell](Images/CloudShell.png)
