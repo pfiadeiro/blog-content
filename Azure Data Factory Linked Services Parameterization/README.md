@@ -20,7 +20,7 @@ You'll also need the Azure CLI which can be installed by following the instructi
 
 ## Execution
 
-Before executing the script, in the file **azuredeploy.parameters.json**, the only parameter that needs to be changed is **clientIpValue** where you should input the ip address you're currently using. This is required in order to connect to the databases and create the objects.
+Before executing the script, in the file **azuredeploy.parameters.json**, the only parameter that **MUST BE** changed is **clientIpValue** where you should input the ip address you're currently using. This is required in order to connect to the databases and create the objects and if you don't change this value and leave the default value (*xxx.xxx.xxx.xxx*), the deployment will fail.
 
 You can change the value of the other parameters but it's not required. Most objects such as the SQL Server, ADF instance and storage accounts will use the parameter value and the resource group unique id to create an unique name. I suggest not altering the value of the other parameters.
 

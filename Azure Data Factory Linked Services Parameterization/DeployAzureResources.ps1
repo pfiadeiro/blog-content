@@ -139,7 +139,7 @@
 
     
     function CreateBlobObject {
-        Write-Host "Starting creation of SQL Database objects" -ForegroundColor Yellow
+        Write-Host "Starting upload of Blob object" -ForegroundColor Yellow
         $BlobObject = Join-Path -Path (Get-Location) -ChildPath '\BlobObjects\FootballClubs.csv'
 
         $SourceStgAccName = az deployment group show -g $RgName --name 'demo-objects' --query properties.outputs.sourceStorageAccountName.value -o tsv
