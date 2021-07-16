@@ -2,7 +2,7 @@
 
 The script *DeployAzureResources.ps1* will help you deploy the required resources to follow the blog post available [here](https://www.pedrofiadeiro.com/azure-data-factory-policies/azure-data-factory-linked-services-parameterization)
 
-The following steps will be done by the script:
+The following actions will be executed by the script:
 - 2 SQL Servers with a database each will be created. 
 - Both will have firewall rules to allow Azure services to connect and your own ip address assuming you specify it correctly.
 - On the source database, a table will be created and a few records inserted. On the target database, a table will be created with no records.
@@ -20,11 +20,15 @@ You'll also need the Azure CLI which can be installed by following the instructi
 
 ## Execution
 
-Before executing the script, in the file **azuredeploy.parameters.json**, the only parameter that **MUST BE** changed is **clientIpValue** where you should input the ip address you're currently using. This is required in order to connect to the databases and create the objects and if you don't change this value and leave the default value (*xxx.xxx.xxx.xxx*), the deployment will fail.
+Before executing the script, in the file **azuredeploy.parameters.json**, the only parameter that **MUST BE** changed is **clientIpValue** where you should input the IP address you're currently using. This is required in order to connect to the databases and create the objects and if you don't change this value and leave the default value (*xxx.xxx.xxx.xxx*), the deployment will fail.
 
 You can change the value of the other parameters but it's not required. Most objects such as the SQL Server, ADF instance and storage accounts will use the parameter value and the resource group unique id to create an unique name. I suggest not altering the value of the other parameters.
 
-To execute the PowerShell script just run
+Before executing the script, you need to make sure you're connected to your Azure account. Run the command **Get-AzSubscription** and if you get an error message such as the one seen in the image below, run the command **Connect-AzAccount** and provide the credentials to connect. Finally, if you have multiple subscriptions associated to your account, you can use the command **Set-AzContext** to define the subscription where you'll be deploying these resources.
+
+![Connect-AzAccount](Images/Connect_AzAccount.png)  
+
+To execute the PowerShell script just run (make sure you set your own password and the correct resource group name, the values below are just illustrative)
 
 ```PowerShell
 .\DeployAzureResources.ps1 -SqlServerPassword 'YourVer1S3cur3Passw0rd' -RgName 'rg-name'

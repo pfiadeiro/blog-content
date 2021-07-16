@@ -196,14 +196,16 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2019-06-01",
+            "apiVersion": "2021-02-01",
             "name": "[variables('sourceStorageAccountName')]",
             "location": "[variables('location')]",
             "sku": {
                 "name": "Standard_LRS"
             },
             "kind": "StorageV2",
-            "properties": {},
+            "properties": {
+                "isHnsEnabled": true
+            },
             "resources": [
                 {
                     "type": "blobServices/containers",
@@ -224,7 +226,9 @@
                 "name": "Standard_LRS"
             },
             "kind": "StorageV2",
-            "properties": {},
+            "properties": {
+                "isHnsEnabled": true
+            },
             "resources": [
                 {
                     "type": "blobServices/containers",
