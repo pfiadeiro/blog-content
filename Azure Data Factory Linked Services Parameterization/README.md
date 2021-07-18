@@ -1,22 +1,22 @@
 ## PowerShell Script
 
-The script *DeployAzureResources.ps1* will help you deploy the required resources to follow the blog post available [here](https://www.pedrofiadeiro.com/azure-data-factory-policies/azure-data-factory-linked-services-parameterization)
+The script *DeployAzureResources.ps1* will help you deploy the required resources to follow the blog post available [here](https://www.pedrofiadeiro.com/azure-data-factory-policies/azure-data-factory-linked-services-parameterization).
 
 The following actions will be executed by the script:
-- 2 SQL Servers with a database each will be created. 
-- Both will have firewall rules to allow Azure services to connect and your own ip address assuming you specify it correctly.
-- On the source database, a table will be created and a few records inserted. On the target database, a table will be created with no records.
+- 2 SQL Servers with a database each will be created 
+- Both will have firewall rules to allow Azure services to connect and your own ip address assuming you specify it correctly
+- On the source database, a table will be created and a few records inserted. On the target database, a table will be created with no records
 - 2 storage accounts, each with a container, will be created. A file will be uploaded to the source storage account
 - A Data Factory Instance will be created. 2 linked services will also be added, one for Azure SQL Database and another for Data Lake Gen2
 - Permissions will be assigned to the ADF instance to access both storage accounts
 
 ## Requirements
 
-In order to run this script you need the PowerShell modules **Az** and **SqlServer**. If you don't have them installed you can do it by executing the instructions seen in the image below
+In order to run this script you need the PowerShell modules **Az** and **SqlServer**. If you don't have them installed you can do it by executing the instructions seen in the image below.
 
 ![PowerShell Modules](Images/PowerShell_Modules.png)
 
-You'll also need the Azure CLI which can be installed by following the instructions [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+You'll also need the Azure CLI which can be installed by following the instructions [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
 
 ## Execution
 
@@ -28,7 +28,7 @@ Before executing the script, you need to make sure you're connected to your Azur
 
 ![Connect-AzAccount](Images/Connect_AzAccount.png)  
 
-To execute the PowerShell script just run (make sure you set your own password and the correct resource group name, the values below are just illustrative)
+To execute the PowerShell script just run (make sure you set your own password and the correct resource group name, the values below are just illustrative):
 
 ```PowerShell
 .\DeployAzureResources.ps1 -SqlServerPassword 'YourVer1S3cur3Passw0rd' -RgName 'rg-name'
